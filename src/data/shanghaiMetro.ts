@@ -387,12 +387,12 @@ export const METRO_EDGES: MetroEdge[] = [
   { from: 'caoyang_lu', to: 'jiangsu_lu', line: '11', distanceKm: 2.3 },
   { from: 'jiangsu_lu', to: 'jiaotong_univ', line: '11', distanceKm: 2.1 },
   { from: 'jiaotong_univ', to: 'xujiahui', line: '11', distanceKm: 0.8 },
-  { from: 'xujiahui', to: 'longhua', line: '11', distanceKm: 3.0 },
-  { from: 'longhua', to: 'dongfang_tiyu', line: '11', distanceKm: 3.4 },
-  { from: 'dongfang_tiyu', to: 'sanlin', line: '11', distanceKm: 3.2 },
-  { from: 'sanlin', to: 'luoshan_lu', line: '11', distanceKm: 7.8 },
-  { from: 'luoshan_lu', to: 'kangxin_gonglu', line: '11', distanceKm: 3.4 },
-  { from: 'kangxin_gonglu', to: 'disney', line: '11', distanceKm: 5.0 },
+  { from: 'xujiahui', to: 'longhua', line: '11', distanceKm: 3.2 },
+  { from: 'longhua', to: 'dongfang_tiyu', line: '11', distanceKm: 3.9 },
+  { from: 'dongfang_tiyu', to: 'sanlin', line: '11', distanceKm: 3.5 },
+  { from: 'sanlin', to: 'luoshan_lu', line: '11', distanceKm: 8.5 },
+  { from: 'luoshan_lu', to: 'kangxin_gonglu', line: '11', distanceKm: 4.5 },
+  { from: 'kangxin_gonglu', to: 'disney', line: '11', distanceKm: 4.7 },
 
   // 12号线
   { from: 'qixin_lu', to: 'guilin_gongyuan', line: '12', distanceKm: 6.6 },

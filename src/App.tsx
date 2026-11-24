@@ -22,6 +22,7 @@ export default function App() {
 
   const [isLocating, setIsLocating] = useState(false);
   const [gpsStatusText, setGpsStatusText] = useState<string | null>(null);
+  const [gpsAccuracyWarning, setGpsAccuracyWarning] = useState<string | null>(null);
   const [gpsError, setGpsError] = useState<string | null>(null);
   const [nearbyMatches, setNearbyMatches] = useState<NearestStationMatch[]>([]);
 
@@ -64,46 +65,63 @@ export default function App() {
     setCustomDistanceKm(null);
   };
 
-  const applyCoordinates = useCallback((lat: number, lng: number, sourceLabel?: string) => {
-    const matches = findNearestStations(lat, lng, 3);
-    setNearbyMatches(matches);
-    if (matches.length > 0) {
-      const nearest = matches[0];
-      setFromId(nearest.station.id);
-      setCustomDistanceKm(null);
-      const distText =
-        nearest.distanceKm < 1
-          ? `${Math.round(nearest.distanceKm * 1000)}m`
-          : `${nearest.distanceKm.toFixed(1)}km`;
-      setGpsStatusText(
-        sourceLabel
-          ? `已按「${sourceLabel}」定位最近站点：${nearest.station.name}（直线距离 ${distText}）`
-          : `已定位当前最近站点：${nearest.station.name}（直线距离 ${distText}）`
-      );
-      setGpsError(null);
-    }
-  }, []);
+  const applyCoordinates = useCallback(
+    (lat: number, lng: number, sourceLabel?: string, accuracyMeters?: number) => {
+      const matches = findNearestStations(lat, lng, 3);
+      setNearbyMatches(matches);
+      if (matches.length > 0) {
+        const nearest = matches[0];
+        setFromId(nearest.station.id);
+        setCustomDistanceKm(null);
+        const distText =
+          nearest.distanceKm < 1
+            ? `${Math.round(nearest.distanceKm * 1000)}m`
+            : `${nearest.distanceKm.toFixed(1)}km`;
+        const accPart = accuracyMeters ? ` · 定位误差约 ±${accuracyMeters}m` : '';
+
+        setGpsStatusText(
+          `${sourceLabel ? `[${sourceLabel}] ` : ''}最近站点：${nearest.station.name}（距坐标 ${distText}${accPart}）`
+        );
+        setGpsError(null);
+
+        if (accuracyMeters && accuracyMeters > 1500) {
+          setGpsAccuracyWarning(
+            `当前设备定位误差较大（±${(accuracyMeters / 1000).toFixed(1)}km，桌面端无 GPS 芯片，浏览器常基于宽带 IP 粗定位）。建议直接搜索站名、选择下方商圈或点击「坐标校准」：`
+          );
+        } else {
+          setGpsAccuracyWarning(null);
+        }
+      }
+    },
+    []
+  );
 
   const handleTriggerGps = useCallback(() => {
     if (!navigator.geolocation) {
-      setGpsError('当前浏览器不支持地理定位，请手动选择起点或使用下方快速位置模拟：');
+      setGpsError('当前浏览器不支持地理定位，请手动选择起点或使用下方位置校准：');
       return;
     }
 
     setIsLocating(true);
     setGpsError(null);
+    setGpsAccuracyWarning(null);
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setIsLocating(false);
-        applyCoordinates(pos.coords.latitude, pos.coords.longitude);
+        applyCoordinates(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          '浏览器定位',
+          Math.round(pos.coords.accuracy)
+        );
       },
       (err) => {
         setIsLocating(false);
         const msg =
           err.code === err.PERMISSION_DENIED
-            ? '未获得浏览器定位权限（或当前预览环境限制定位），可点击下方模拟所在区域或手动搜索起点站：'
-            : '暂时无法获取当前 GPS 坐标，可点击下方模拟所在区域或手动搜索起点站：';
+            ? '未获得浏览器定位权限，可手动搜站或点击下方商圈快速定位：'
+            : '暂时无法获取当前坐标，可手动搜站或点击下方商圈快速定位：';
         setGpsError(msg);
       },
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
@@ -216,10 +234,11 @@ export default function App() {
                 showGpsButton
                 isLocating={isLocating}
                 gpsStatusText={gpsStatusText}
+                gpsAccuracyWarning={gpsAccuracyWarning}
                 gpsError={gpsError}
                 nearbyMatches={nearbyMatches}
                 onTriggerGps={handleTriggerGps}
-                onSimulateCoords={applyCoordinates}
+                onSimulateCoords={(lat, lng, lbl) => applyCoordinates(lat, lng, lbl)}
               />
 
               <div className="flex justify-center md:pt-7">
