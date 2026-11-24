@@ -1,11 +1,29 @@
-<div align="center">
+# 沪铁精算 · 上海地铁 2026 新票价与通勤次卡测算工具
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+依据上海市发展改革委及上海地铁官方公告（`service.shmetro.com/yygg/5747.htm`，2026 年 12 月 1 日起实施）构建的纯前端交互式票价与通勤成本精算工具。
 
-  <h1>Built with AI Studio</h2>
+## 核心功能
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+1. **当前位置最近站点识别**：调用浏览器 Geolocation API 获取坐标，通过 Haversine 球面距离匹配最近上海地铁站（同时内置商圈模拟位置供调试）。
+2. **新旧单程票价精算**：基于上海地铁加权路网图（Dijkstra 最短计价路径）计算站间里程，对比：
+   - **新规票价（2026-12-01起）**：0~4km 3元；后续每 `4, 4, 4, 7, 7, 10, 10` km 加 1 元；50km 以上每 15km 加 1 元。
+   - **旧规票价（原标准）**：0~6km 3元；6km 以上每 10km 加 1 元。
+3. **通勤次卡方案对比引擎**：按 30 个自然日周期模拟以下 6 种策略的真实总成本与折合单价：
+   - 新规单程累计（自然月累计满 **90 元** 后超出部分享 **9 折**）
+   - 官方四档计次票：**35次/190元**、**45次/210元**、**60次/270元**、**90次/390元**（自动计算超次补足成本及余次浪费）
+   - 调价前基准（旧票价 + 满 **70 元** 后享 9 折）
+4. **盈亏平衡曲线与常驻通勤保存**：交互式 SVG 成本曲线展示 10~95 次月乘车频次下的拐点，支持将常驻通勤路线保存至 `localStorage`。
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## 本地开发与构建
 
-</div>
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+## 技术栈
+
+- React 19 + TypeScript + Vite
+- Tailwind CSS v4
+- Lucide React Icons

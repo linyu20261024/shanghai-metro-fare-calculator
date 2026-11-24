@@ -1,0 +1,6 @@
+{
+  "name": "沪铁通 · 上海地铁新票价与次卡精算",
+  "description": "根据当前位置与目的地计算2026年12月上海地铁新票价，结合通勤频次对比满90元9折与四档计次票方案，提供最优省钱建议。",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": []
+}
